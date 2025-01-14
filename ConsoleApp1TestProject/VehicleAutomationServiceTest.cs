@@ -18,12 +18,12 @@ namespace ConsoleApp1TestProject
             var map = new Map(10, 10);
             var vehicle = new Vehicle(string.Empty, new VehicleStatus(0, 0, Direction.S));
             var vehicleInstruction = new VehicleInstruction(vehicle, new List<Instruction>() { Instruction.F });
-            var vehicleStatus = _vechicleAutomationService.CalculateVehicleStatus(map, vehicleInstruction);
+            var vehiclePath = _vechicleAutomationService.CalculateVehiclePath(map, vehicleInstruction);
 
             var expectedX = 0;
             var expectedY = 0;
-            Assert.Equal(vehicleStatus.Last().X, expectedX);
-            Assert.Equal(vehicleStatus.Last().Y, expectedY);
+            Assert.Equal(vehiclePath.Path.Last().X, expectedX);
+            Assert.Equal(vehiclePath.Path.Last().Y, expectedY);
         }
 
         [Fact]
@@ -32,12 +32,12 @@ namespace ConsoleApp1TestProject
             var map = new Map(10, 10);
             var vehicle = new Vehicle(string.Empty, new VehicleStatus(0, 9, Direction.N));
             var vehicleInstruction = new VehicleInstruction(vehicle, new List<Instruction>() { Instruction.F });
-            var vehicleStatus = _vechicleAutomationService.CalculateVehicleStatus(map, vehicleInstruction);
+            var vehiclePath = _vechicleAutomationService.CalculateVehiclePath(map, vehicleInstruction);
 
             var expectedX = 0;
             var expectedY = 9;
-            Assert.Equal(vehicleStatus.Last().X, expectedX);
-            Assert.Equal(vehicleStatus.Last().Y, expectedY);
+            Assert.Equal(vehiclePath.Path.Last().X, expectedX);
+            Assert.Equal(vehiclePath.Path.Last().Y, expectedY);
         }
 
         [Fact]
@@ -46,12 +46,12 @@ namespace ConsoleApp1TestProject
             var map = new Map(10, 10);
             var vehicle = new Vehicle(string.Empty, new VehicleStatus(0, 0, Direction.W));
             var vehicleInstruction = new VehicleInstruction(vehicle, new List<Instruction>() { Instruction.F });
-            var vehicleStatus = _vechicleAutomationService.CalculateVehicleStatus(map, vehicleInstruction);
+            var vehicleStatus = _vechicleAutomationService.CalculateVehiclePath(map, vehicleInstruction);
 
             var expectedX = 0;
             var expectedY = 0;
-            Assert.Equal(vehicleStatus.Last().X, expectedX);
-            Assert.Equal(vehicleStatus.Last().Y, expectedY);
+            Assert.Equal(vehicleStatus.Path.Last().X, expectedX);
+            Assert.Equal(vehicleStatus.Path.Last().Y, expectedY);
         }
 
         [Fact]
@@ -60,12 +60,12 @@ namespace ConsoleApp1TestProject
             var map = new Map(10, 10);
             var vehicle = new Vehicle(string.Empty, new VehicleStatus(9, 0, Direction.E));
             var vehicleInstruction = new VehicleInstruction(vehicle, new List<Instruction>() { Instruction.F });
-            var vehicleStatus = _vechicleAutomationService.CalculateVehicleStatus(map, vehicleInstruction);
+            var vehicleStatus = _vechicleAutomationService.CalculateVehiclePath(map, vehicleInstruction);
 
             var expectedX = 9;
             var expectedY = 0;
-            Assert.Equal(vehicleStatus.Last().X, expectedX);
-            Assert.Equal(vehicleStatus.Last().Y, expectedY);
+            Assert.Equal(vehicleStatus.Path.Last().X, expectedX);
+            Assert.Equal(vehicleStatus.Path.Last().Y, expectedY);
         }
 
         [Fact]
@@ -79,14 +79,36 @@ namespace ConsoleApp1TestProject
             };
             var ADCInputs = _inputParserService.ParseADCInput(inputs);
           
-            var vehicleStatus = _vechicleAutomationService.CalculateVehicleStatus(ADCInputs.Map, ADCInputs.VehicleInstructions.First());
+            var vehicleStatus = _vechicleAutomationService.CalculateVehiclePath(ADCInputs.Map, ADCInputs.VehicleInstructions.First());
 
             var expectedX = 4;
             var expectedY = 3;
             var expectedDirection = Direction.S;
-            Assert.Equal(vehicleStatus.Last().X, expectedX);
-            Assert.Equal(vehicleStatus.Last().Y, expectedY);
-            Assert.Equal(vehicleStatus.Last().Direction, expectedDirection);
+            Assert.Equal(vehicleStatus.Path.Last().X, expectedX);
+            Assert.Equal(vehicleStatus.Path.Last().Y, expectedY);
+            Assert.Equal(vehicleStatus.Path.Last().Direction, expectedDirection);
+        }
+
+        [Fact]
+        public void VehicleCollion()
+        {
+            var vehiclesStatuses = new List<VehiclePath>()
+            {
+                new VehiclePath("A", new List<VehicleStatus>() { new VehicleStatus(1, 1, Direction.N), new VehicleStatus(1, 1, Direction.E), new VehicleStatus(2, 1, Direction.E) }),
+                new VehiclePath("B", new List<VehicleStatus>() { new VehicleStatus(5, 1, Direction.N), new VehicleStatus(5, 1, Direction.E) }),
+                new VehiclePath("C", new List<VehicleStatus>() { new VehicleStatus(6, 6, Direction.N), new VehicleStatus(6, 6, Direction.E), new VehicleStatus(6, 6, Direction.S) }),
+                new VehiclePath("D", new List<VehicleStatus>() { new VehicleStatus(2, 1, Direction.N) })
+            };
+
+            var collisionDetail = _vechicleAutomationService.CollionCheck(vehiclesStatuses);
+            if (collisionDetail != null)
+            {
+                var expectedStepNo = 2;
+                var expectedNoOfVehicleCollided = 2;
+
+                Assert.Equal(collisionDetail.StepNo, expectedStepNo);
+                Assert.Equal(collisionDetail.CollidedVehicle.Count(), expectedNoOfVehicleCollided);
+            }
         }
     }
 }

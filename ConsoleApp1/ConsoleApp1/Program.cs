@@ -8,8 +8,9 @@ using ConsoleApp1;
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 
-builder.Services.AddScoped<IInputOutputService, ConsoleInputService>();
+builder.Services.AddScoped<IInputOutputService, ConsoleInputOutputService>();
 builder.Services.AddScoped<IInputParserService, InputParserService>();
+builder.Services.AddScoped<IVehicleAutomationService, VehicleAutomationService>();
 builder.Services.AddTransient<ADCRunner>();
 
 using IHost host = builder.Build();
@@ -24,10 +25,6 @@ static void ExemplifyServiceLifetime(IServiceProvider hostProvider, string lifet
 
     IServiceProvider provider = serviceScope.ServiceProvider;
 
-    var logger = provider.GetRequiredService<ADCRunner>();
-
-    logger.ReportServiceLifetimeDetails(
-        $"{lifetime}: Call 2 to provider.GetRequiredService<ServiceLifetimeReporter>()");
-
-
+    var runner = provider.GetRequiredService<ADCRunner>();
+    runner.ADCRunnerExecute();
 }

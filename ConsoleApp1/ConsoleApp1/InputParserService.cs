@@ -19,6 +19,7 @@ namespace ConsoleApp1
 
     public class InputParserService: IInputParserService
     {
+        private const int numOfLinePerInstruction = 3;
 
         public ADCInputs ParseADCInput(List<string> inputs)
         {
@@ -50,14 +51,14 @@ namespace ConsoleApp1
                 var vehicleInstructions = new List<VehicleInstruction>();
 
                 // in part 2, each vehicle need 4 lines of instruction
-                var divisibleBy4 = (numOfLines - 1) % 4;
-                var numOfVehicles = (numOfLines - 1) / 4;
-                if (divisibleBy4 == 0)
+                var divisibleBy3 = (numOfLines - 1) % numOfLinePerInstruction;
+                var numOfVehicles = (numOfLines - 1) / numOfLinePerInstruction;
+                if (divisibleBy3 == 0)
                 {
                     for (int i = 0; i < numOfVehicles; i++)
                     {
-                        var vehicle = ParseVehicleInput(inputs[2 + (i * 4)], inputs[3 + (i * 4)]);
-                        var instructions = ParseInstructionInput(inputs[4 + (i * 4)]);
+                        var vehicle = ParseVehicleInput(inputs[1 + (i * numOfLinePerInstruction)], inputs[2 + (i * numOfLinePerInstruction)]);
+                        var instructions = ParseInstructionInput(inputs[3 + (i * numOfLinePerInstruction)]);
                         var vehicleInstruction = new VehicleInstruction(vehicle, instructions);
                         vehicleInstructions.Add(vehicleInstruction);
                     }

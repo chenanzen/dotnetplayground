@@ -8,20 +8,23 @@ namespace ConsoleApp1
 {
     interface IVehicleAutomationService
     {
-        List<VehicleStatus> CalculateVehicleStatus(Map map, VehicleInstruction vehicleInstruction);
+        VehiclePath CalculateVehiclePath(Map map, VehicleInstruction vehicleInstruction);
+        VehicleCollision? CollionCheck(List<VehiclePath> vehiclesPath);
     }
     public class VehicleAutomationService : IVehicleAutomationService
     {
-        public List<VehicleStatus> CalculateVehicleStatus(Map map, VehicleInstruction vehicleInstruction)
+        public VehiclePath CalculateVehiclePath(Map map, VehicleInstruction vehicleInstruction)
         {
-            var vehicleStatus = new List<VehicleStatus>()
-            {
-                vehicleInstruction.Vehicle.VehicleInitialStatus
-            };
+            var vehiclePath = new VehiclePath(
+                vehicleInstruction.Vehicle.VehicleName,
+                new List<VehicleStatus>()
+                {
+                    vehicleInstruction.Vehicle.VehicleStatus
+                });
 
-            var currentLocationX = vehicleInstruction.Vehicle.VehicleInitialStatus.X;
-            var currentLocationY = vehicleInstruction.Vehicle.VehicleInitialStatus.Y;
-            var currentDirection = vehicleInstruction.Vehicle.VehicleInitialStatus.Direction;
+            var currentLocationX = vehicleInstruction.Vehicle.VehicleStatus.X;
+            var currentLocationY = vehicleInstruction.Vehicle.VehicleStatus.Y;
+            var currentDirection = vehicleInstruction.Vehicle.VehicleStatus.Direction;
             foreach (var instruction in vehicleInstruction.Instructions)
             {
                 // run instruction
@@ -74,33 +77,43 @@ namespace ConsoleApp1
                         break;
                 }
 
-                vehicleStatus.Add(new VehicleStatus(currentLocationX, currentLocationY, currentDirection));
+                vehiclePath.Path.Add(new VehicleStatus(currentLocationX, currentLocationY, currentDirection));
             }
 
-            return vehicleStatus;
+            return vehiclePath;
         }
 
-        public void CollionCheck(List<List<VehicleStatus>> vehiclesStatuses)
+        public VehicleCollision? CollionCheck(List<VehiclePath> vehiclesPath)
         {
-            var numOfVehicles = vehiclesStatuses.Count;
-            var totalNumOfTeps = vehiclesStatuses.Max(vs => vs.Count);
-
-            for (var i = 0; i < totalNumOfTeps; i++)
+            var numOfVehicles = vehiclesPath.Count;
+            var totalNumOfSteps = vehiclesPath.Max(vs => vs.Path.Count);
+            for (var i = 0; i < totalNumOfSteps; i++)
             {
                 // get location at step i
+                var vehiclesStatusAtPositioni = vehiclesPath.Select(vs => GetVehicleStatusAtPosition(vs, i)).ToList();
 
-                foreach (var vehicleStatus in vehiclesStatuses)
+                var collions = vehiclesStatusAtPositioni.GroupBy(p => new { p.VehicleStatus.X, p.VehicleStatus.Y }).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
+                if (collions.Any())
                 {
-                    if (vehicleStatus.Count > i)
-                    {
-
-                    }
-                    else
-                    {
-
-                    }
-                    vehicleStatus[i]
+                    var collisionDetail = new VehicleCollision(i, collions);
+                    return collisionDetail;
                 }
             }
+
+            return null;
+        }
+
+        public Vehicle GetVehicleStatusAtPosition(VehiclePath vehiclePath, int position) 
+        {
+            if (vehiclePath.Path == null || vehiclePath.Path.Count == 0) throw new ArgumentNullException("Vehicle path is not initiated properly.");
+            else 
+            {
+                VehicleStatus result = vehiclePath.Path.Last();
+                if (vehiclePath.Path.Count > position)
+                    result = vehiclePath.Path[position];
+
+                return new Vehicle(vehiclePath.VehicleName, new VehicleStatus(result.X, result.Y, result.Direction));
+            }
+        }
     }
 }

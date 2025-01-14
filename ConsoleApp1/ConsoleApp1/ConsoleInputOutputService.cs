@@ -11,16 +11,13 @@ namespace ConsoleApp1
     public interface IInputOutputService
     {
         List<string> GetInput();
+        void SendOuput(VehiclePath vehiclePath);
+        void SendOuput(VehicleCollision? collision);
+
     }
 
-    internal class ConsoleInputService: IInputOutputService
+    internal class ConsoleInputOutputService: IInputOutputService
     {
-        private readonly ILogger logger;
-
-        ConsoleInputService(ILogger logger)
-        {
-            this.logger = logger;
-        }
 
         public List<string> GetInput()
         {
@@ -53,9 +50,33 @@ namespace ConsoleApp1
             return inputs;
         }
 
-        public void SendOuput(string output)
+        public void SendOuput(VehiclePath vehiclePath)
         {
-            Console.WriteLine(output);
+            var lastPosition = vehiclePath?.Path?.LastOrDefault();
+            if (lastPosition != null)
+            {
+                Console.WriteLine($"{lastPosition.X} {lastPosition.Y} {lastPosition.Direction.ToString()}");
+            }
+            else
+            {
+                Console.WriteLine("Vehicle path is not calculated correctly.");
+            }
+        }
+
+        public void SendOuput(VehicleCollision? collision)
+        {
+            if (collision?.CollidedVehicle != null && collision.CollidedVehicle.Count > 0)
+            {
+                var vehicleNames = string.Join(" ", collision.CollidedVehicle.SelectMany(v => v.VehicleName));
+                var vehicleStat = collision.CollidedVehicle.First().VehicleStatus;
+                Console.WriteLine(vehicleNames);
+                Console.WriteLine($"{vehicleStat.X} {vehicleStat.Y}");
+                Console.WriteLine($"{collision.StepNo}");
+            }
+            else
+            {
+                Console.WriteLine("no collision");
+            }
         }
     }
 

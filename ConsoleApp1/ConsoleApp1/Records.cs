@@ -23,7 +23,9 @@ namespace ConsoleApp1
 
     public record ADCInputs(Map Map, List<VehicleInstruction> VehicleInstructions);
     public record Map(int Width, int Height);
-    public record Vehicle(string VehicleName, VehicleStatus VehicleInitialStatus);
+    public record Vehicle(string VehicleName, VehicleStatus VehicleStatus);
+    public record VehiclePath(string VehicleName, List<VehicleStatus> Path);
     public record VehicleInstruction(Vehicle Vehicle, List<Instruction> Instructions);
     public record VehicleStatus(int X, int Y, Direction Direction);
+    public record VehicleCollision(int StepNo, List<Vehicle> CollidedVehicle);
 }
