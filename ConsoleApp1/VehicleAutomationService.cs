@@ -103,6 +103,86 @@ namespace ConsoleApp1
             return null;
         }
 
+        public VehicleCollision? NoCarSwapOnStep(List<VehiclePath> vehiclesPath)
+        {
+            var totalNumOfSteps = vehiclesPath.Max(vs => vs.Path.Count);
+            for (var i = 0; i < totalNumOfSteps; i++)
+            {
+                if (i == 0)
+                {
+                    continue; 
+                }
+                else
+                {
+                    foreach(var vehicle in vehiclesPath)
+                    {
+                        // position of vehicle at step i
+                        var vehicleStatusAtPositioni = GetVehicleStatusAtPosition(vehicle, i);
+
+                        // all vehicles
+                        var vehiclesStatusAtPositioniminus = vehiclesPath.Select(vs => GetVehicleStatusAtPosition(vs, i - 1)).ToList();
+                        var possibleSwapVehicles = vehiclesStatusAtPositioniminus.Where(v =>
+                            v.VehicleStatus.X == vehicleStatusAtPositioni.VehicleStatus.X
+                            && v.VehicleStatus.Y == vehicleStatusAtPositioni.VehicleStatus.Y).ToList();
+
+                        if (possibleSwapVehicles.Any())
+                        {
+                            var posibleSwapVechicle = possibleSwapVehicles.First();
+
+                            var pathOfPossibleSwapVehicle = vehiclesPath.Where(vp => vp.VehicleName == posibleSwapVechicle.VehicleName).First();
+                            
+                            var vehicleStatusAtPositioniminus = GetVehicleStatusAtPosition(pathOfPossibleSwapVehicle, i - 1);
+
+                            if (vehicleStatusAtPositioniminus.VehicleStatus.X == vehicleStatusAtPositioniminus.VehicleStatus.X
+                                    && vehicleStatusAtPositioniminus.VehicleStatus.Y == vehicleStatusAtPositioniminus.VehicleStatus.Y)
+                            {
+                                var collision = new List<Vehicle>()
+                                    {
+                                        vehicleStatusAtPositioni,
+                                        vehicleStatusAtPositioniminus,
+                                    };
+                                var collisionDetail = new VehicleCollision(i, collision);
+                                return collisionDetail;
+                            }
+
+
+                            //foreach (var possibleSwapVehicle in possibleSwapVehicles)
+                            //{
+                            //    possibleSwapVehicle.
+                            //    var possibleSwapVehiclePosAti = GetVehicleStatusAtPosition(possibleSwapVehicle, i);
+                            //    if (possibleSwapVehiclePosAti.VehicleStatus.X == vehicleStatusAtPositioniminus.VehicleStatus.X
+                            //        && possibleSwapVehiclePosAti.VehicleStatus.Y == vehicleStatusAtPositioniminus.VehicleStatus.Y)
+                            //    {
+                            //        var collision = new List<Vehicle>()
+                            //        {
+                            //            vehicleStatusAtPositioni,
+                            //            possibleSwapVehiclePosAti,
+                            //        };
+                            //        var collisionDetail = new VehicleCollision(i, collision);
+                            //        return collisionDetail;
+                            //    }
+
+                            //}
+                        }
+                    }
+
+                    // check position before, if they swap
+                    //var vehiclesStatusAtPositioni = vehiclesPath.Select(vs => GetVehicleStatusAtPosition(vs, i)).ToList();
+
+
+
+
+                }
+
+                // get location at step i
+
+
+            }
+
+
+            return null; 
+        }
+
         public Vehicle GetVehicleStatusAtPosition(VehiclePath vehiclePath, int position) 
         {
             if (vehiclePath.Path == null || vehiclePath.Path.Count == 0) throw new ArgumentNullException("Vehicle path is not initiated properly.");

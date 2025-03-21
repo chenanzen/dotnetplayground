@@ -18,7 +18,10 @@ namespace ConsoleApp1
 
         public void ADCRunnerExecute()
         {
+            // simple IO
             var inputs = inputOutputService.GetInput();
+
+            // input parser
             var ADCInputs = inputParserService.ParseADCInput(inputs);
 
             // process ADCInput

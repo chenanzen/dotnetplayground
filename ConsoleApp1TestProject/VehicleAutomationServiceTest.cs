@@ -94,8 +94,8 @@ namespace ConsoleApp1TestProject
         {
             var vehiclesStatuses = new List<VehiclePath>()
             {
-                new VehiclePath("A", new List<VehicleStatus>() { new VehicleStatus(1, 1, Direction.N), new VehicleStatus(1, 1, Direction.E), new VehicleStatus(2, 1, Direction.E) }),
-                new VehiclePath("B", new List<VehicleStatus>() { new VehicleStatus(5, 1, Direction.N), new VehicleStatus(5, 1, Direction.E) }),
+                new VehiclePath("A", new List<VehicleStatus>() { new VehicleStatus(1, 2, Direction.N), new VehicleStatus(1, 1, Direction.E), new VehicleStatus(2, 1, Direction.E) }),
+                new VehiclePath("B", new List<VehicleStatus>() { new VehicleStatus(1, 3, Direction.S), new VehicleStatus(5, 1, Direction.E) }),
                 new VehiclePath("C", new List<VehicleStatus>() { new VehicleStatus(6, 6, Direction.N), new VehicleStatus(6, 6, Direction.E), new VehicleStatus(6, 6, Direction.S) }),
                 new VehiclePath("D", new List<VehicleStatus>() { new VehicleStatus(2, 1, Direction.N) })
             };
@@ -108,6 +108,29 @@ namespace ConsoleApp1TestProject
 
                 Assert.Equal(collisionDetail.StepNo, expectedStepNo);
                 Assert.Equal(collisionDetail.CollidedVehicle.Count(), expectedNoOfVehicleCollided);
+            }
+        }
+
+        [Fact]
+        public void CarSwapCanCauseCollision()
+        {
+            var vehiclesStatuses = new List<VehiclePath>()
+            {
+                new VehiclePath("A", new List<VehicleStatus>() { new VehicleStatus(1, 2, Direction.N), new VehicleStatus(1, 3, Direction.N) }),
+                new VehiclePath("B", new List<VehicleStatus>() { new VehicleStatus(1, 3, Direction.S), new VehicleStatus(1, 2, Direction.S) })
+            };
+
+            var collisionDetail = _vechicleAutomationService.NoCarSwapOnStep(vehiclesStatuses);
+
+            Assert.NotNull(collisionDetail);
+            if (collisionDetail != null)
+            {
+                var expectedStepNo = 1;
+                var expectedNoOfVehicleCollided = 2;
+
+                Assert.Equal(collisionDetail.StepNo, expectedStepNo);
+                Assert.Equal(collisionDetail.CollidedVehicle.Count(), expectedNoOfVehicleCollided);
+
             }
         }
     }

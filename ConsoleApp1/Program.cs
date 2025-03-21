@@ -1,7 +1,4 @@
-﻿
-
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ConsoleApp1;
 
@@ -22,9 +19,7 @@ await host.RunAsync();
 static void ExemplifyServiceLifetime(IServiceProvider hostProvider, string lifetime)
 {
     using IServiceScope serviceScope = hostProvider.CreateScope();
-
     IServiceProvider provider = serviceScope.ServiceProvider;
-
     var runner = provider.GetRequiredService<ADCRunner>();
     runner.ADCRunnerExecute();
 }
