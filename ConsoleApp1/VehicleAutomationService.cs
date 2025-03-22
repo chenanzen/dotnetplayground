@@ -11,6 +11,7 @@ namespace ConsoleApp1
         VehiclePath CalculateVehiclePath(Map map, VehicleInstruction vehicleInstruction);
         VehicleCollision? CollionCheck(List<VehiclePath> vehiclesPath);
     }
+
     public class VehicleAutomationService : IVehicleAutomationService
     {
         public VehiclePath CalculateVehiclePath(Map map, VehicleInstruction vehicleInstruction)
