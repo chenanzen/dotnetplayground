@@ -16,7 +16,7 @@ namespace TicketBooking.Services
         /// <returns>true if there are enough ticket; false other wise</returns>
         bool IsAvailable(int numOfTicket);
 
-        Booking Book(int numOfTicket, string preferredSeat);
+        Booking Book(int numOfTicket, string preferredSeat = "");
 
         void Confirm(string bookingNo);
 
@@ -40,7 +40,8 @@ namespace TicketBooking.Services
         public string GenerateBookingNumber()
         {
             var totalNumOfBooking = _movieTheaterService.GetSeats()
-                .SelectMany(r => r.Select(s => s.BookingNumber))
+                .SelectMany(r => r.Where(s => s.Status != SeatBookingStatus.Avail)
+                                  .Select(s => s.BookingNumber))
                 .Distinct().Count();
             var bookingIdx = totalNumOfBooking + 1;
             var bookingNo = $"GIC{bookingIdx:D3}";
@@ -107,7 +108,7 @@ namespace TicketBooking.Services
             return numOfTicketReserved;
         }
 
-        public Booking Book(int numOfTicket, string preferredSeat)
+        public Booking Book(int numOfTicket, string preferredSeat = "")
         {
             var rows = _movieTheaterService.GetSeats();
 

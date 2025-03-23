@@ -41,19 +41,26 @@ namespace TicketBooking.Tests
 
         [Theory]
         [InlineData(0, "GIC001")]
+        [InlineData(2, "GIC003")]
+        [InlineData(5, "GIC006")]
         public void GenerateBookingNumberTest(int numOfExistingBooking, string expectedBookingNumber)
         {
             // clear movie theater
             _movieTheaterService.Reset(10, 10);
+            // create numOfExistingBooking fake entries
+            for(int i=0; i<numOfExistingBooking; i++) _bookingService.Book(1);
 
+            // generate booking number
             var generatedBookingNumber = _bookingService.GenerateBookingNumber();
 
             Assert.Equal(generatedBookingNumber, expectedBookingNumber);
         }
 
         [Theory]
-        [InlineData(4, 0, 4, new int[] { 3, 4, 5, 6 })]
-        public void ReserveRowTest(int numOfTicket, int rowNo, int preferredSeatNo, int[] filledSeats)
+        [InlineData(4, 0, -1, new int[] { }, new int[] { 3, 4, 5, 6 })]
+        [InlineData(4, 0, 4, new int[] { 3, 4, 5, 6 }, new int[] { 7, 8, 9 })]
+        public void ReserveRowTest(int numOfTicket, int rowNo, int preferredSeatNo
+            , int[] filledSeats, int[] expectedReservedSeats)
         {
             // clear movie theater
             _movieTheaterService.Reset(10, 10);
@@ -73,10 +80,8 @@ namespace TicketBooking.Tests
                 .Where(x => x.seat.BookingNumber == bookingNo)
                 .Select(x => x.idx);
 
-            IEnumerable<int> expectedIndex = new List<int>() { 3, 4, 5, 6 };
-
-            Assert.Equal(reservedNumOfTicket, numOfTicket);
-            Assert.True(expectedIndex.SequenceEqual(reservedSeats));
+            Assert.Equal(reservedNumOfTicket, expectedReservedSeats.Length);
+            Assert.True(expectedReservedSeats.SequenceEqual(reservedSeats));
         }
     }
 }

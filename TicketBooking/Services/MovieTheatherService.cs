@@ -43,7 +43,7 @@ namespace TicketBooking.Services
 
         public List<List<Seat>> GetSeats()
         {
-            throw new NotImplementedException();
+            return Seats;
         }
 
         public List<Seat> GetRows(int rowNo)
