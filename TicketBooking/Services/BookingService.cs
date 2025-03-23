@@ -16,9 +16,11 @@ namespace TicketBooking.Services
         /// <returns>true if there are enough ticket; false other wise</returns>
         bool IsAvailable(int numOfTicket);
 
-        Booking Book(int numOfTicket, string preferredSeat = "");
+        string Book(int numOfTicket);
 
-        void Confirm(string bookingNo);
+        string ChangeSeat(string bookingNo, string preferredSeat);
+
+        void Confirm();
 
         Point TranslateToPoint(string preferredSeat);
 
@@ -30,7 +32,6 @@ namespace TicketBooking.Services
     internal class BookingService : IBookingService
     {
         private readonly IMovieTheaterService _movieTheaterService;
-
 
         public BookingService(IMovieTheaterService movieTheaterServivce)
         {
@@ -108,16 +109,12 @@ namespace TicketBooking.Services
             return numOfTicketReserved;
         }
 
-        public Booking Book(int numOfTicket, string preferredSeat = "")
+        public string Book(int numOfTicket)
         {
             var rows = _movieTheaterService.GetSeats();
 
-            // translate entered preferred seat into x, y points
-            var preferredSeatPoint = TranslateToPoint(preferredSeat);
-
-            // if user entered preferred row is larger than theater size, reset to nothing selected
-            if (preferredSeatPoint.X >= rows.Count)
-                preferredSeatPoint.X = 0;
+            // preference
+            var preferredSeatPoint = TranslateToPoint("");
 
             // generate booking number
             var bookingNo = GenerateBookingNumber();
@@ -137,19 +134,52 @@ namespace TicketBooking.Services
                 ticketLeftToReserved = numOfTicket - reservedTickets;
             }
 
-            // take seat(s)
-
-            // if need more 
-
-
-            throw new NotImplementedException();
+            return bookingNo;
         }
 
-
-
-        public void Confirm(string bookingNo)
+        public string ChangeSeat(string bookingNo, string preferredSeat)
         {
-            // get 
+            var rows = _movieTheaterService.GetSeats();
+
+            // translate entered preferred seat into x, y points
+            var preferredSeatPoint = TranslateToPoint(preferredSeat);
+
+            // if user entered preferred row is larger than theater size, reset to nothing selected
+            if (preferredSeatPoint.X >= rows.Count)
+                preferredSeatPoint.X = 0;
+
+            // remove current reservation
+            var reserved = rows.SelectMany(r => r.Select(s => s)).Where(s => s.BookingNumber == bookingNo).ToList();
+            var numOfTicket = reserved.Count;
+            foreach (var item in reserved)
+            {
+                item.BookingNumber = "";
+                item.Status = SeatBookingStatus.Avail;
+            }
+
+            // reserve with seats preferences
+            var ticketLeftToReserved = numOfTicket;
+            var preferredRow = preferredSeatPoint.X;
+            var preferredSeatNo = preferredSeatPoint.Y;
+            while (ticketLeftToReserved > 0)
+            {
+                var reservedTickets = ReserveRow(bookingNo, ticketLeftToReserved, preferredSeatNo, preferredRow);
+
+                // go to next row
+                preferredRow++;
+                preferredSeatNo = -1;
+
+                // check if we still need further ticket to 
+                ticketLeftToReserved = numOfTicket - reservedTickets;
+            }
+
+            return bookingNo;
+
+        }
+
+        public void Confirm()
+        {
+            _movieTheaterService.ConfirmSeat();
         }
     }
 }

@@ -18,29 +18,24 @@ namespace TicketBooking.Tests
             _inputParserService = new InputParserService();
         }
 
-        //[Theory]
-        //[ClassData(typeof(MyTestData))]
-        //[InlineData("Inception 8 10", "Inception", 8, 10)]
-        //[InlineData("Inception810", false, "", 0, 0)]
-        //public void TryParseTheaterInputTest(string input, bool expectedCanParse, string expectedTitle, int expectedRow, int expectedSeatPerRow)
-        //{
-        //    TheaterDetail output = _inputParserService.TryParseTheaterInput(input);
-
-        //    Assert.NotNull(output);
-        //    Assert.Equal(expectedTitle, output.Title);
-        //    Assert.Equal(expectedRow, output.Row);
-        //    Assert.Equal(expectedSeatPerRow, output.SeatPerRow);
-        //}
-    }
-
-    class TryParseTheaterInputData : IEnumerable<object[]>
-    {
-        public IEnumerator<object[]> GetEnumerator()
+        [Theory]
+        [InlineData("Inception 8 10", true, "Inception", 8, 10)]
+        [InlineData("Inception810", false, "", 0, 0)]
+        public void TryParseTheaterInputTest(string input, bool expectedCanParse, string expectedTitle, int expectedRow, int expectedSeatPerRow)
         {
-            yield return new object[] { "Inception 8 10", new TheaterDetail { Title = "Inception", Row = 8, SeatPerRow = 10 }};
-            yield return new object[] { "Inception810", null };
-        }
+            TheaterDetail output = _inputParserService.TryParseTheaterInput(input);
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            if (!expectedCanParse)
+            {
+                Assert.Null(output);
+            }
+            else
+            {
+                Assert.NotNull(output);
+                Assert.Equal(expectedTitle, output.Title);
+                Assert.Equal(expectedRow, output.Row);
+                Assert.Equal(expectedSeatPerRow, output.SeatPerRow);
+            }
+        }
     }
 }

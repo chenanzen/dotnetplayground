@@ -14,7 +14,9 @@ namespace TicketBooking.Services
         /// </summary>
         /// <param name="numOfRow"></param>
         /// <param name="numOfSeatPerRow"></param>
-        void Reset(int numOfRow, int numOfSeatPerRow);
+        void Reset(string movieTitle, int numOfRow, int numOfSeatPerRow);
+
+        string GetMovieTitle();
 
         /// <summary>
         /// Get seats mapping
@@ -35,13 +37,14 @@ namespace TicketBooking.Services
 
     internal class MovieTheaterService : IMovieTheaterService
     {
+        private string _movieTitle = "";
         public List<List<Seat>> Seats { get; set; } = new List<List<Seat>>();
         public MovieTheaterService() { }
 
-
-
-        public void Reset(int numOfRow, int numOfSeatPerRow)
+        public void Reset(string movieTitle, int numOfRow, int numOfSeatPerRow)
         {
+            _movieTitle = movieTitle;
+
             Seats = new List<List<Seat>>();
             for (int row = 0; row < numOfRow; row++)
             {
@@ -50,6 +53,11 @@ namespace TicketBooking.Services
                 Seats.Add(newrow);
             }
 
+        }
+
+        public string GetMovieTitle() 
+        {
+            return _movieTitle;
         }
 
         public List<List<Seat>> GetSeats()

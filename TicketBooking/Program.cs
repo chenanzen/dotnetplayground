@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.CompilerServices;
 using TicketBooking.Services;
 using static TicketBooking.Services.TBUtil;
 
@@ -7,23 +8,24 @@ var serviceProvider = new ServiceCollection()
             .AddSingleton<IMovieTheaterService, MovieTheaterService>()
             .AddSingleton<IBookingService, BookingService>()
             .AddSingleton<IInputParserService, InputParserService>()
+            .AddSingleton<IInputService, InputService>()
             .BuildServiceProvider();
 
 // Resolve the service and use it
 var bookingService = serviceProvider.GetService<IBookingService>();
 var inputParserService = serviceProvider.GetService<IInputParserService>();
 var movieTheaterService = serviceProvider.GetService<IMovieTheaterService>();
-if (inputParserService == null || movieTheaterService == null || bookingService == null)
+var inputService = serviceProvider.GetService<IInputService>();
+
+if (inputParserService == null || movieTheaterService == null || bookingService == null || inputService == null)
 {
     Console.WriteLine("Unexpected error(s) occured when initializing service");
     return;
 }
 
-string? input;
-bool goodInputEntered = false;
-
 // get theater detail
-TheaterDetail theaterDetail = null;
+string? input;
+TheaterDetail? theaterDetail = null;
 while (theaterDetail == null)
 {
     Console.WriteLine("Please define movie title and seating map in [Title] [Row] [Seat PerRow] format:");
@@ -39,7 +41,7 @@ while (theaterDetail == null)
 // show menu
 if (theaterDetail != null)
 {
-    movieTheaterService.Reset(theaterDetail.Row, theaterDetail.SeatPerRow);
+    movieTheaterService.Reset(theaterDetail.Title, theaterDetail.Row, theaterDetail.SeatPerRow);
 
     MenuSelection menuSelection = MenuSelection.Invalid;
     while (menuSelection == MenuSelection.Invalid)
@@ -60,15 +62,19 @@ if (theaterDetail != null)
         {
             case MenuSelection.Invalid: 
                 break;
-            case MenuSelection.Book: 
+            case MenuSelection.Book:
+                inputService.MakeBookings();
                 break;
-            case MenuSelection.Check: 
+            case MenuSelection.Check:
+                Console.WriteLine();
+                Console.WriteLine("Enter booking id, or enter blank to go back to main menu:");
+                Console.Write("> ");
+                input = Console.ReadLine();
                 break;
             case MenuSelection.Exit: 
                 // do nothing, it will exit
                 break;
         }
     }
-
-
 }
+

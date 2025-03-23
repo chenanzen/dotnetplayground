@@ -58,5 +58,13 @@ namespace TicketBooking.Services
             return menuSelection;
         }
 
+        public MenuSelection TryParsePointInput(string? input)
+        {
+            MenuSelection menuSelection;
+            if (!Enum.TryParse<MenuSelection>(input, out menuSelection))
+                menuSelection = MenuSelection.Invalid;
+
+            return menuSelection;
+        }
     }
 }

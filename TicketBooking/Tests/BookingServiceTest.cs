@@ -17,7 +17,7 @@ namespace TicketBooking.Tests
             _movieTheaterService = new MovieTheaterService();
             _bookingService = new BookingService(_movieTheaterService);
 
-            _movieTheaterService.Reset(10, 10);
+            _movieTheaterService.Reset("", 10, 10);
         }
 
 
@@ -46,7 +46,7 @@ namespace TicketBooking.Tests
         public void GenerateBookingNumberTest(int numOfExistingBooking, string expectedBookingNumber)
         {
             // clear movie theater
-            _movieTheaterService.Reset(10, 10);
+            _movieTheaterService.Reset("", 10, 10);
             // create numOfExistingBooking fake entries
             for(int i=0; i<numOfExistingBooking; i++) _bookingService.Book(1);
 
@@ -63,7 +63,7 @@ namespace TicketBooking.Tests
             , int[] filledSeats, int[] expectedReservedSeats)
         {
             // clear movie theater
-            _movieTheaterService.Reset(10, 10);
+            _movieTheaterService.Reset("", 10, 10);
             // init filledSeats
             var bookedNo = "booked";
             foreach (int filledSeat in filledSeats)
