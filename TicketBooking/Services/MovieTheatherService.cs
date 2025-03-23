@@ -16,7 +16,18 @@ namespace TicketBooking.Services
         /// <param name="numOfSeatPerRow"></param>
         void Reset(int numOfRow, int numOfSeatPerRow);
 
+        /// <summary>
+        /// Get seats mapping
+        /// </summary>
+        /// <returns>List of List of Seat</returns>
         List<List<Seat>> GetSeats();
+
+        /// <summary>
+        /// Calculate and return number of available seats
+        /// </summary>
+        /// <returns>int of available seat</returns>
+        int GetNoOfAvailableSeats();
+
         List<Seat> GetRows(int rowNo);
         void BookSeat(string bookingNo, int row, int col);
         void ConfirmSeat();
@@ -24,13 +35,13 @@ namespace TicketBooking.Services
 
     internal class MovieTheaterService : IMovieTheaterService
     {
-        public List<Booking> Bookings { get; set; } = new List<Booking>();
         public List<List<Seat>> Seats { get; set; } = new List<List<Seat>>();
         public MovieTheaterService() { }
 
+
+
         public void Reset(int numOfRow, int numOfSeatPerRow)
         {
-            Bookings = new List<Booking>();
             Seats = new List<List<Seat>>();
             for (int row = 0; row < numOfRow; row++)
             {
@@ -44,6 +55,12 @@ namespace TicketBooking.Services
         public List<List<Seat>> GetSeats()
         {
             return Seats;
+        }
+
+        public int GetNoOfAvailableSeats()
+        {
+            var noOfAvailableSeats = Seats.Sum(r => r.Count(s => s.Status == SeatBookingStatus.Avail));
+            return noOfAvailableSeats;
         }
 
         public List<Seat> GetRows(int rowNo)
@@ -77,5 +94,6 @@ namespace TicketBooking.Services
                 }
             }
         }
+
     }
 }

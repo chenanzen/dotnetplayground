@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace TicketBooking.Services
 {
-    public static class TBUtil
+    internal static class TBUtil
     {
+        internal enum MenuSelection
+        {
+            Invalid = 0,
+            Book = 1,
+            Check = 2,
+            Exit = 3
+        }
+
         public static char NumberToLetter(int number)
         {
             if (number < 0 || number > 25)
