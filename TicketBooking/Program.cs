@@ -23,56 +23,30 @@ if (inputParserService == null || movieTheaterService == null || bookingService 
     return;
 }
 
-// get theater detail
-string? input;
-TheaterDetail? theaterDetail = null;
-while (theaterDetail == null)
-{
-    Console.WriteLine("Please define movie title and seating map in [Title] [Row] [Seat PerRow] format:");
-    Console.Write("> ");
-    input = Console.ReadLine();
-    
-    // exit when empty space entered
-    if (string.IsNullOrEmpty(input)) return;
-
-    theaterDetail = inputParserService.TryParseTheaterInput(input);
-}
+// get theater detail, keep asking until quit or valid input
+var theaterDetail = inputService.GetTheaterDetail();
 
 // show menu
 if (theaterDetail != null)
 {
     movieTheaterService.Reset(theaterDetail.Title, theaterDetail.Row, theaterDetail.SeatPerRow);
 
-    MenuSelection menuSelection = MenuSelection.Invalid;
-    while (menuSelection == MenuSelection.Invalid)
+    var menuSelection = MenuSelection.Invalid;
+    while(menuSelection != MenuSelection.Exit)
     {
-        var noOfAvailableSeats = movieTheaterService.GetNoOfAvailableSeats();
-
-        Console.WriteLine();
-        Console.WriteLine("Welcome to GIC Cinemas");
-        Console.WriteLine($"[1] Book tickets for {theaterDetail.Title} ({noOfAvailableSeats} seats available)");
-        Console.WriteLine("[2] Check bookings");
-        Console.WriteLine("[3] Exit");
-        Console.WriteLine("Please enter your selection:");
-        Console.Write("> ");
-        input = Console.ReadLine();
-
-        menuSelection = inputParserService.TryParseMenuInput(input);
+        menuSelection = inputService.GetMenuSelection();
         switch (menuSelection)
         {
-            case MenuSelection.Invalid: 
+            case MenuSelection.Invalid:
                 break;
             case MenuSelection.Book:
                 inputService.MakeBookings();
                 break;
             case MenuSelection.Check:
-                Console.WriteLine();
-                Console.WriteLine("Enter booking id, or enter blank to go back to main menu:");
-                Console.Write("> ");
-                input = Console.ReadLine();
+                inputService.CheckBookings();
                 break;
-            case MenuSelection.Exit: 
-                // do nothing, it will exit
+            case MenuSelection.Exit:
+                inputService.Exit();
                 break;
         }
     }

@@ -45,7 +45,7 @@ namespace TicketBooking.Services
                                   .Select(s => s.BookingNumber))
                 .Distinct().Count();
             var bookingIdx = totalNumOfBooking + 1;
-            var bookingNo = $"GIC{bookingIdx:D3}";
+            var bookingNo = $"GIC{bookingIdx:D4}";
 
             return bookingNo;
         }
@@ -88,11 +88,18 @@ namespace TicketBooking.Services
             // if no preferredSeatNo, set to default logic of find closest to mid
             if (preferredSeatNo == -1)
             {
-                var rowIsEmpty = row.All(r => r.Status == SeatBookingStatus.Avail);
-                if (rowIsEmpty)
-                {
-                    // find center point
+                if (row.Count > numOfTicket)
                     assignedSeat = (row.Count - numOfTicket) / 2;
+                else assignedSeat = 0;
+
+                // ensure assigned seat is available, if not available go to seat to right
+                for (int i = assignedSeat; i < row.Count; i++) 
+                {
+                    if (row[i].Status == SeatBookingStatus.Avail)
+                    {
+                        assignedSeat = i;
+                        break;
+                    }
                 }
             }
 
@@ -131,7 +138,7 @@ namespace TicketBooking.Services
                 preferredSeatNo = -1;
 
                 // check if we still need further ticket to 
-                ticketLeftToReserved = numOfTicket - reservedTickets;
+                ticketLeftToReserved = ticketLeftToReserved - reservedTickets;
             }
 
             return bookingNo;
@@ -170,7 +177,7 @@ namespace TicketBooking.Services
                 preferredSeatNo = -1;
 
                 // check if we still need further ticket to 
-                ticketLeftToReserved = numOfTicket - reservedTickets;
+                ticketLeftToReserved = ticketLeftToReserved - reservedTickets;
             }
 
             return bookingNo;

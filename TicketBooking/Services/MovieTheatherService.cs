@@ -74,7 +74,7 @@ namespace TicketBooking.Services
         public List<Seat> GetRows(int rowNo)
         {
             if (rowNo < 0 || rowNo >= Seats.Count) return new List<Seat>();
-            else return Seats[0];
+            else return Seats[rowNo];
         }
 
         public void BookSeat(string bookingNo, int row, int col)
